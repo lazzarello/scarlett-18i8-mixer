@@ -2,15 +2,19 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/>
-    {{ info }}
+    <Scarlett cardinfo="cardinfo should be a variable" />
+    <h1>The soundcards</h1>
+      <p>Device Name: {{ info.cardid }}</p>
+      <p>Device Info: {{ info.info }}</p>
   </div>
 </template>
 
 
 <script>
   import HelloWorld from './components/HelloWorld.vue'
+  import Scarlett from './components/Scarlett.vue'
   import axios from 'axios'
-  var apiURL = 'http://localhost:1234/jsonapi?request=card-get-all';
+  var apiURL = 'http://localhost:1234/jsonapi?request=';
 
   export default {
     data () {
@@ -19,11 +23,12 @@
       }
     },
     mounted () {
-      axios.get(apiURL).then(response => (this.info = response));
+      axios.get(apiURL + 'card-get-all').then(response => (this.info = response.data.data[3]));
     },
     name: 'App',
     components: {
-      HelloWorld
+      HelloWorld,
+      Scarlett
     }
   }
 </script>
