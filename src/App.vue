@@ -1,22 +1,18 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-    <ScarlettAPI />
+    <Scarlett />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import ScarlettAPI from './components/ScarlettAPI.vue'
+  import Scarlett from './components/Scarlett.vue'
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld,
-    ScarlettAPI
+  export default {
+    name: 'App',
+    components: {
+      Scarlett
+    }
   }
-}
 </script>
 
 <style>
