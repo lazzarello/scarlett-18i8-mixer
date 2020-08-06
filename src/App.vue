@@ -1,8 +1,31 @@
 <template>
   <div id="app">
-    {{ info }}
+    <img alt="Vue logo" src="./assets/logo.png">
+    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
+
+
+<script>
+  import HelloWorld from './components/HelloWorld.vue'
+  import axios from 'axios'
+  var apiURL = 'http://localhost:1234/jsonapi?request=card-get-all';
+
+  export default {
+    data () {
+      return {
+        info: null
+      }
+    },
+    mounted () {
+      axios.get(apiURL).then(response => (this.info = response));
+    },
+    name: 'App',
+    components: {
+      HelloWorld
+    }
+  }
+</script>
 
 <style>
 #app {
