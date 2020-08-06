@@ -1,7 +1,16 @@
 <template>
   <div class="scarlett">
-    <h1>Scarlett 18i8 Mixer</h1>
-      <p>Found Device: <tt>{{ info | findScarlett }}</tt></p>
+    <section v-if="errored">
+      <p>The ALSA API is down, that's bad</p>
+    </section>
+    <section v-else>
+      <div v-if="loading">Loading...</div>
+
+      <div v-else>
+        <h1>Scarlett 18i8 Mixer</h1>
+        <p>Found Device: <tt>{{ info | findScarlett }}</tt></p>
+      </div>
+    </section> 
   </div>
 </template>
 
@@ -11,7 +20,9 @@
   export default {
     data () {
       return {
-        info: null
+        info: null,
+        loading: true,
+        errored: false
       }
     },
     filters: {
@@ -35,8 +46,14 @@
       }
     },
     mounted () {
-      axios.get(apiURL + 'card-get-all').then(response => (this.info = response.data.data));
-      // need to do error handling
+      axios
+        .get(apiURL + 'card-get-all')
+        .then(response => (this.info = response.data.data))
+        .catch(error => {
+          console.log(error)
+          this.errored = true
+        })
+        .finally(() => this.loading = false)
     },
     name: 'Scarlett'
   }
