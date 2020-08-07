@@ -40,7 +40,7 @@
           }
         })
         if ( found ) {
-          return outInfo.info
+          return outInfo.name
         } else {
           outInfo = {"error": "No Scarlett device found"}
           return outInfo
