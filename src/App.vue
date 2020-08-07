@@ -1,19 +1,16 @@
 <template>
   <div id="app">
     <Scarlett />
-    <ScarlettMixer />
   </div>
 </template>
 
 <script>
   import Scarlett from './components/Scarlett.vue'
-  import ScarlettMixer from './components/ScarlettMixer.vue'
 
   export default {
     name: 'App',
     components: {
-      Scarlett,
-      ScarlettMixer
+      Scarlett
     }
   }
 </script>

@@ -11,11 +11,13 @@
         <p>Found Device: <tt>{{ info | findScarlett }}</tt></p>
       </div>
     </section> 
+    <ScarlettMixer />
   </div>
 </template>
 
 <script>
   import axios from 'axios'
+  import ScarlettMixer from './ScarlettMixer.vue'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   export default {
     data () {
@@ -55,6 +57,9 @@
         })
         .finally(() => this.loading = false)
     },
-    name: 'Scarlett'
+    name: 'Scarlett',
+    components: {
+      ScarlettMixer
+    }
   }
 </script>
