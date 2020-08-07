@@ -1,17 +1,14 @@
 <template>
   <div class="mixer">
     <h1>I'm a ScarlettMixer!</h1>
-    <tt>{{ controls }}</tt>
+    <tt>{{ controls.data }}</tt>
     <div id="dial"></div>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
-  //import Nexus from 'nexusui'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
-  //https://nexus-js.github.io/ui/api/#intro
-  //var dial = new Nexus.Dial('#dial')
   export default {
     data () {
       return {
