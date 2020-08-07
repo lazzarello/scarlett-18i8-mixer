@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import './plugins/axios'
-import App from './App.vue' // no data because we're not importing it?
-// commenting this out removes the default template, which is a bit weird.
+import App from './App.vue' 
 
 Vue.config.productionTip = false;
 //Vue.config.runtimeCompiler = true;
