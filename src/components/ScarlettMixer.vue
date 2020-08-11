@@ -1,6 +1,6 @@
 <template>
   <div class="mixer">
-    <button v-on:click="pan1()">Load Mixer Controls</button>
+    <button v-on:click="pan1(controls)">Load Mixer Controls</button>
     <h1>I'm a ScarlettMixer!</h1>
     <div id="channel">
       <div id="pan"></div>
@@ -10,7 +10,7 @@
     <div id="debug">
       <hr />
       <h3>Debugging</h3>
-      <tt>{{ controls.data }}</tt>
+      <tt>{{ controls.data[24]}}</tt>
     </div>
   </div>
 </template>
@@ -21,12 +21,18 @@
   // https://nexus-js.github.io/ui/api/#intro
   import Nexus from 'nexusui'
   //we gotta seperate the actual rendering of NexusUI elements before the context is started
-  function loadAudio() {
+  function loadAudio(controls) {
+  //function loadAudio() {
     Nexus.context.resume();
+    var data = controls.data[24];
 
     var pan = new Nexus.Pan('#pan');
     var volume = new Nexus.Slider("#volume", {
-      'size': [20,200]
+      'size': [20,200],
+      'min': data.ctrl.min,
+      'max': data.ctrl.max,
+      'step': data.ctrl.step,
+      'value': data.value[0]
     });
     var outbus = new Nexus.Toggle('#outbus');
 
@@ -37,6 +43,9 @@
 
     volume.on('change', function(v) {
       console.log('Volume ' + v);
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data.numid + '&value=' + v)
+        .then(response => (console.log(response)));
     })
 
     outbus.on('change', function(v) {
@@ -55,6 +64,15 @@
         context: Nexus.context
       }
     },
+    filters: {
+      controlNames(controls) {
+        var names = []
+        controls.forEach(val => {
+          names.push(val.name)
+        });
+        return names;
+      }
+    }, 
     mounted () {
       // There can be more than one device named hw:USB
       // I'll have to pass in cardid from a value from the Scarlett component
