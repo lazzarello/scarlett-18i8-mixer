@@ -9,6 +9,7 @@
       <div v-else>
         <h1>Scarlett 18i8 Mixer</h1>
         <p>Found Device: <tt>{{ info | findScarlett }}</tt></p>
+        <ScarlettMixer />
       </div>
     </section> 
   </div>
@@ -38,7 +39,7 @@
           }
         })
         if ( found ) {
-          return outInfo.info
+          return outInfo.name
         } else {
           outInfo = {"error": "No Scarlett device found"}
           return outInfo
@@ -55,6 +56,9 @@
         })
         .finally(() => this.loading = false)
     },
-    name: 'Scarlett'
+    name: 'Scarlett',
+    components: {
+      'ScarlettMixer': () => import('./ScarlettMixer.vue')
+    }
   }
 </script>
