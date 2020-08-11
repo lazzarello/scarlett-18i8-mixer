@@ -9,6 +9,10 @@
 <script>
   import axios from 'axios'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
+  import Nexus from 'nexusui'
+  // https://nexus-js.github.io/ui/api/#intro
+  // eslint-disable-next-line no-unused-vars
+  var dial = new Nexus.Dial('#dial')
   export default {
     data () {
       return {
@@ -19,7 +23,7 @@
     },
     mounted () {
       // There can be more than one device named hw:USB
-      // I'll have to pass in cardid from a value from the Scarlett component, so like nested component? vuex?
+      // I'll have to pass in cardid from a value from the Scarlett component
       axios
         .get(apiURL + 'ctrl-get-all' + '&cardid=hw:USB')
         .then(response => (this.controls = response.data))

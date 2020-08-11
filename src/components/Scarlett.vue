@@ -17,7 +17,6 @@
 
 <script>
   import axios from 'axios'
-  import ScarlettMixer from './ScarlettMixer.vue'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   export default {
     data () {
@@ -59,7 +58,7 @@
     },
     name: 'Scarlett',
     components: {
-      ScarlettMixer
+      'ScarlettMixer': () => import('./ScarlettMixer.vue')
     }
   }
 </script>
