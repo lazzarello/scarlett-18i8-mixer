@@ -10,7 +10,7 @@
     <div id="debug">
       <hr />
       <h3>Debugging</h3>
-      <tt>{{ controls.data[24]}}</tt>
+      <tt>{{ controls.data[43] }}</tt>
     </div>
   </div>
 </template>
@@ -24,15 +24,15 @@
   function loadAudio(controls) {
   //function loadAudio() {
     Nexus.context.resume();
-    var data = controls.data[24];
+    var data = [controls.data[43], controls.data[62]];
 
     var pan = new Nexus.Pan('#pan');
     var volume = new Nexus.Slider("#volume", {
       'size': [20,200],
-      'min': data.ctrl.min,
-      'max': data.ctrl.max,
-      'step': data.ctrl.step,
-      'value': data.value[0]
+      'min': data[0].ctrl.min,
+      'max': data[0].ctrl.max,
+      'step': data[0].ctrl.step,
+      'value': data[0].value[0]
     });
     var outbus = new Nexus.Toggle('#outbus');
 
@@ -43,8 +43,13 @@
 
     volume.on('change', function(v) {
       console.log('Volume ' + v);
+      data[0].value = v;
+      data[1].value = v;
       axios
-        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data.numid + '&value=' + v)
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v)
+        .then(response => (console.log(response)));
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
         .then(response => (console.log(response)));
     })
 
