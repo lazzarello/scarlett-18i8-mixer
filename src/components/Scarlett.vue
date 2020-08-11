@@ -9,9 +9,9 @@
       <div v-else>
         <h1>Scarlett 18i8 Mixer</h1>
         <p>Found Device: <tt>{{ info | findScarlett }}</tt></p>
+        <ScarlettMixer />
       </div>
     </section> 
-    <ScarlettMixer />
   </div>
 </template>
 
