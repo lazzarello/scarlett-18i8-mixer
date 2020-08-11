@@ -1,24 +1,58 @@
 <template>
   <div class="mixer">
+    <button v-on:click="pan1()">Load Mixer Controls</button>
     <h1>I'm a ScarlettMixer!</h1>
-    <tt>{{ controls.data }}</tt>
-    <div id="dial"></div>
+    <div id="channel">
+      <div id="pan"></div>
+      <div id="volume"></div>
+      <div id="outbus"></div>
+    </div>
+    <div id="debug">
+      <hr />
+      <h3>Debugging</h3>
+      <tt>{{ controls.data }}</tt>
+    </div>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
-  import Nexus from 'nexusui'
   // https://nexus-js.github.io/ui/api/#intro
-  // eslint-disable-next-line no-unused-vars
-  var dial = new Nexus.Dial('#dial')
+  import Nexus from 'nexusui'
+  //we gotta seperate the actual rendering of NexusUI elements before the context is started
+  function loadAudio() {
+    Nexus.context.resume();
+
+    var pan = new Nexus.Pan('#pan');
+    var volume = new Nexus.Slider("#volume", {
+      'size': [20,200]
+    });
+    var outbus = new Nexus.Toggle('#outbus');
+
+    var channel = [pan, volume, outbus];
+    pan.on('change', function(v) {
+      console.log('Pan ' + v.value);
+    })
+
+    volume.on('change', function(v) {
+      console.log('Volume ' + v);
+    })
+
+    outbus.on('change', function(v) {
+      console.log('Channel ' + v);
+    })
+    return channel;
+  }
+
   export default {
     data () {
       return {
         controls: null,
         loading: true,
-        errored: false
+        errored: false,
+        pan1: loadAudio,
+        context: Nexus.context
       }
     },
     mounted () {
