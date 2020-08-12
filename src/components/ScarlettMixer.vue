@@ -10,7 +10,7 @@
     <div id="debug">
       <hr />
       <h3>Debugging</h3>
-      <tt>{{ controls.data[43] }}</tt>
+      <tt>{{ controls.data[41] }}</tt>
     </div>
   </div>
 </template>
@@ -23,11 +23,15 @@
   //we gotta seperate the actual rendering of NexusUI elements before the context is started
   function loadAudio(controls) {
     Nexus.context.resume();
-    var data = [controls.data[43], controls.data[62]];
+    // our two output channels
+    // this will expand to 8 to match the physical outs of the hardware
+    // they should be static values but need to verify the IDs on another computer
+    var data = [controls.data[41], controls.data[59]];
 
     var pan = new Nexus.Pan('#pan', {
       'value': 0
     });
+
     var volume = new Nexus.Slider("#volume", {
       'size': [20,200],
       'min': data[0].ctrl.min,
@@ -35,22 +39,28 @@
       'step': data[0].ctrl.step,
       'value': data[0].value[0]
     });
+    // this will update the Analogue Output Playback enums
+    // Capture => mixer in 1,2,3 = analog in 1, PCM1, PCM2
     var outbus = new Nexus.Toggle('#outbus');
 
     var channel = [pan, volume, outbus];
     pan.on('change', function(v) {
-      /*
-      if ( pan.value === 0 ) {
-        data[0].value = v;
-        data[1].value = v;
-      } else if ( pan.value < 0 ) {
-        data[0].value = v;
-        data[1].value = v - (v * pan.value);
-      } else if ( pan.value > 0 ) {
-        data[0].value = v - (v * pan.value);
-        data[1].value = v;
+      if ( v.value === 0 ) {
+        data[0].value;
+        data[1].value;
+      } else if ( v.value < 0 ) {
+        data[0].value;
+        data[1].value -= Math.abs(v.value);
+      } else if ( v.value > 0 ) {
+        data[0].value -=  Math.abs(v.value);
+        data[1].value;
       }
-      */
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + data[0].value)
+        .then(response => (console.log(response)));
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + data[1].value)
+        .then(response => (response));
       console.log(v.value);
     })
 
