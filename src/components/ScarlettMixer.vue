@@ -101,6 +101,22 @@
     })
 
     outbus.on('change', function(v) {
+      if ( v ) {
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
+          .then(response => (console.log(response)));
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
+          .then(response => (console.log(response)));        
+      } else {
+        v = 0
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
+          .then(response => (console.log(response)));
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
+          .then(response => (console.log(response)));        
+      } 
       console.log('Channel ' + v);
     })
     return channel;
