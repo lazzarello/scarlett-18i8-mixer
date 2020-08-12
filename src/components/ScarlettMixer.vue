@@ -22,11 +22,12 @@
   import Nexus from 'nexusui'
   //we gotta seperate the actual rendering of NexusUI elements before the context is started
   function loadAudio(controls) {
-  //function loadAudio() {
     Nexus.context.resume();
     var data = [controls.data[43], controls.data[62]];
 
-    var pan = new Nexus.Pan('#pan');
+    var pan = new Nexus.Pan('#pan', {
+      'value': 0
+    });
     var volume = new Nexus.Slider("#volume", {
       'size': [20,200],
       'min': data[0].ctrl.min,
@@ -38,19 +39,39 @@
 
     var channel = [pan, volume, outbus];
     pan.on('change', function(v) {
-      console.log('Pan ' + v.value);
+      /*
+      if ( pan.value === 0 ) {
+        data[0].value = v;
+        data[1].value = v;
+      } else if ( pan.value < 0 ) {
+        data[0].value = v;
+        data[1].value = v - (v * pan.value);
+      } else if ( pan.value > 0 ) {
+        data[0].value = v - (v * pan.value);
+        data[1].value = v;
+      }
+      */
+      console.log(v.value);
     })
 
     volume.on('change', function(v) {
-      console.log('Volume ' + v);
-      data[0].value = v;
-      data[1].value = v;
+      if ( pan.value === 0 ) {
+        data[0].value = v;
+        data[1].value = v;
+      } else if ( pan.value < 0 ) {
+        data[0].value = v;
+        data[1].value = v - Math.abs(v * pan.value);
+      } else if ( pan.value > 0 ) {
+        data[0].value = v - Math.abs(v * pan.value);
+        data[1].value = v;
+      }
+      console.log({'L': data[0].value,'R': data[1].value,'value': v});
       axios
-        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v)
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + data[0].value)
         .then(response => (console.log(response)));
       axios
-        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
-        .then(response => (console.log(response)));
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + data[1].value)
+        .then(response => (response));
     })
 
     outbus.on('change', function(v) {
