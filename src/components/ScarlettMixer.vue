@@ -64,6 +64,8 @@
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
           .then(response => (console.log(response)));
       } else if ( pan.value > 0 ) {
+        data[0].value = value;
+        data[1].value = v;
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + value)
           .then(response => (console.log(response)));
@@ -71,6 +73,8 @@
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
           .then(response => (console.log(response)));
       } else if ( pan.value < 0 ) {
+        data[0].value = v;
+        data[1].value = value;
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
           .then(response => (console.log(response)));
