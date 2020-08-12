@@ -55,6 +55,8 @@
       // this is a mess
       var value = v - Math.abs(v * pan.value);
       if ( pan.value === 0 ) {
+        data[0].value = v;
+        data[1].value = v;
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
           .then(response => (console.log(response)));
