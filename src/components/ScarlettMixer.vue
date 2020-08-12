@@ -48,6 +48,36 @@
     var channel = [pan, volume, outbus];
 
     pan.on('change', function(v) {
+      var l;
+      var r;
+      if ( v.value === 0 ) {
+        l = data[0].value * 1
+        r = data[1].value * 1
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+          .then(response => (console.log(response)));
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+          .then(response => (console.log(response)));        
+      } else if ( v.value > 0 ) {
+        l = data[0].value * Math.abs(v.value)
+        r = data[1].value * 1
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+          .then(response => (console.log(response)));
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+          .then(response => (console.log(response)));        
+      } else if ( v.value < 0 ) {
+        r = data[0].value * 1
+        l = data[1].value * Math.abs(v.value)
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+          .then(response => (console.log(response)));
+        axios
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+          .then(response => (console.log(response)));        
+      }
       console.log(v.value);
     })
 
