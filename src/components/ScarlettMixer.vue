@@ -41,7 +41,9 @@
     });
     // this will update the Analogue Output Playback enums
     // Capture => mixer in 1,2,3 = analog in 1, PCM1, PCM2
-    var outbus = new Nexus.Toggle('#outbus');
+    var outbus = new Nexus.Toggle('#outbus', {
+      'state': true
+    });
 
     var channel = [pan, volume, outbus];
 
@@ -73,6 +75,7 @@
 
     volume.on('change', function(v) {
       // this is a mess
+      var value = v - Math.abs(v * pan.value);
       if ( pan.value === 0 ) {
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
@@ -81,14 +84,12 @@
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
           .then(response => (console.log(response)));
       } else if ( pan.value > 0 ) {
-        var value = v - Math.abs(v * pan.value);
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + value)
           .then(response => (console.log(response)));
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
           .then(response => (console.log(response)));
-        console.log(value);
       } else if ( pan.value < 0 ) {
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
@@ -97,7 +98,6 @@
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + value)
           .then(response => (response));
       }
-      console.log({'L': data[0].value,'R': data[1].value,'value': v});
     })
 
     outbus.on('change', function(v) {
