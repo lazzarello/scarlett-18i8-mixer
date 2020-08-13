@@ -3,6 +3,7 @@
     <button v-on:click="pan1(controls)">Load Mixer Controls</button>
     <h1>I'm a ScarlettMixer!</h1>
     <div id="channel">
+      <div id="input"></div>
       <div id="pan"></div>
       <div id="volume"></div>
       <div id="outbus"></div>
@@ -10,7 +11,7 @@
     <div id="debug">
       <hr />
       <h3>Debugging</h3>
-      <tt>{{ controls.data[41] }}</tt>
+      <tt>{{ controls.data[59] }}</tt>
     </div>
   </div>
 </template>
@@ -20,6 +21,7 @@
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   // https://nexus-js.github.io/ui/api/#intro
   import Nexus from 'nexusui'
+
   //we gotta seperate the actual rendering of NexusUI elements before the context is started
   function loadAudio(controls) {
     Nexus.context.resume();
@@ -27,6 +29,10 @@
     // this will expand to 8 to match the physical outs of the hardware
     // they should be static values but need to verify the IDs on another computer
     var data = [controls.data[41], controls.data[59]];
+
+    var input = new Nexus.Select('#input', {
+      'options': ['mic 1', 'mic 2']
+    });
 
     var pan = new Nexus.Pan('#pan', {
       'value': 0
@@ -45,7 +51,7 @@
       'state': true
     });
 
-    var channel = [pan, volume, outbus];
+    var channel = [input, pan, volume, outbus];
 
     pan.on('change', function(v) {
       var l;
