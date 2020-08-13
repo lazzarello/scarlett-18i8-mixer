@@ -56,8 +56,10 @@
     pan.on('change', function(v) {
       // how to do a equal power pan
       // https://forum.juce.com/t/how-do-stereo-panning-knobs-work/25773/9
-      var l = data[0].value * Math.min(1 - v.value, 1.0);
-      var r = data[1].value * Math.min(1 + v.value, 1.0);
+      var l = data[0].value * Math.min(1 - v.value, 1.0) * outbus.state;
+      var r = data[1].value * Math.min(1 + v.value, 1.0) * outbus.state;
+      // this is probably not needed because I think the API is breaking not this code
+      // but panning does stop working after a few hundred events
       //data[0].value = l;
       //data[1].value = r;
       axios
@@ -70,8 +72,8 @@
     })
 
     volume.on('change', function(v) {
-      var l = v * Math.min(1 - pan.value, 1.0);
-      var r = v * Math.min(1 + pan.value, 1.0);
+      var l = v * Math.min(1 - pan.value, 1.0) * outbus.state;
+      var r = v * Math.min(1 + pan.value, 1.0) * outbus.state;
       data[0].value = l;
       data[1].value = r;
       axios
@@ -84,21 +86,21 @@
 
     outbus.on('change', function(v) {
       // need some logic to stay muted when volume fader events move
-      var l = volume.value * Math.min(1 - pan.value, 1.0);
-      var r = volume.value * Math.min(1 + pan.value, 1.0);
+      var l = volume.value * Math.min(1 - pan.value, 1.0) * v;
+      var r = volume.value * Math.min(1 + pan.value, 1.0) * v;
       if ( v ) {
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l * 1)
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l)
           .then(response => (console.log(response)));
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r * 1)
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
           .then(response => (console.log(response)));        
       } else {
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + 0 )
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
           .then(response => (console.log(response)));
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + 0)
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
           .then(response => (console.log(response)));        
       } 
       console.log('Channel ' + v);
