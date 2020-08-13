@@ -54,83 +54,51 @@
     var channel = [input, pan, volume, outbus];
 
     pan.on('change', function(v) {
-      var l;
-      var r;
-      if ( v.value === 0 ) {
-        l = data[0].value * 1
-        r = data[1].value * 1
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
-          .then(response => (console.log(response)));        
-      } else {
-        l = data[0].value * v.L
-        r = data[1].value * v.R
-        console.log('Right channel: ' + v.R + ' Left channel: ' + v.L);
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
-          .then(response => (console.log(response)));        
-      }
+      // how to do a equal power pan
+      // https://forum.juce.com/t/how-do-stereo-panning-knobs-work/25773/9
+      var l = data[0].value * Math.min(1 - v.value, 1.0);
+      var r = data[1].value * Math.min(1 + v.value, 1.0);
+      //data[0].value = l;
+      //data[1].value = r;
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+        .then(response => (console.log(response)));
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+        .then(response => (console.log(response)));        
+      console.log('Left channel: ' + l + ' Right channel: ' + r);
     })
 
     volume.on('change', function(v) {
-      // this is a mess
-      var value = v - Math.abs(v * pan.value);
-      if ( pan.value === 0 ) {
-        data[0].value = v;
-        data[1].value = v;
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
-          .then(response => (console.log(response)));
-      } else if ( pan.value > 0 ) {
-        data[0].value = value;
-        data[1].value = v;
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + value)
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
-          .then(response => (console.log(response)));
-      } else if ( pan.value < 0 ) {
-        data[0].value = v;
-        data[1].value = value;
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + value)
-          .then(response => (response));
-      }
+      var l = v * Math.min(1 - pan.value, 1.0);
+      var r = v * Math.min(1 + pan.value, 1.0);
+      data[0].value = l;
+      data[1].value = r;
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+        .then(response => (console.log(response)));
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+        .then(response => (console.log(response)));
     })
 
     outbus.on('change', function(v) {
-      var l;
-      var r;
+      // need some logic to stay muted when volume fader events move
+      var l = volume.value * Math.min(1 - pan.value, 1.0);
+      var r = volume.value * Math.min(1 + pan.value, 1.0);
       if ( v ) {
-        l = data[0].value * 1
-        r = data[1].value * 1
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l * 1)
           .then(response => (console.log(response)));
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r * 1)
           .then(response => (console.log(response)));        
       } else {
-        l = data[0].value * 0
-        r = data[1].value * 0
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + 0 )
           .then(response => (console.log(response)));
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + 0)
           .then(response => (console.log(response)));        
       } 
       console.log('Channel ' + v);
