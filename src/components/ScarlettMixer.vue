@@ -2,12 +2,7 @@
   <div class="mixer">
     <button v-on:click="pan1(controls)">Load Mixer Controls</button>
     <h1>I'm a ScarlettMixer!</h1>
-    <div id="channel">
-      <div id="input"></div>
-      <div id="pan"></div>
-      <div id="volume"></div>
-      <div id="outbus"></div>
-    </div>
+    <ScarlettMixerChannels />
     <div id="debug">
       <hr />
       <h3>Debugging</h3>
@@ -21,7 +16,7 @@
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   // https://nexus-js.github.io/ui/api/#intro
   import Nexus from 'nexusui'
-
+  import ScarlettMixerChannels from './components/ScarlettMixerChannels.vue'
   //we gotta seperate the actual rendering of NexusUI elements before the context is started
   function loadAudio(controls) {
     Nexus.context.resume();
@@ -153,6 +148,9 @@
         })
         .finally(() => this.loading = false)
     },
-    name: 'ScarlettMixer'
+    name: 'ScarlettMixer',
+    components: {
+      ScarlettMixerChannels
+    }
   }
 </script>
