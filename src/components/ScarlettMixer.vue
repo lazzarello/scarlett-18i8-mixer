@@ -11,7 +11,7 @@
     <div id="debug">
       <hr />
       <h3>Debugging</h3>
-      <tt>{{ controls.data[59] }}</tt>
+      <tt>{{ controls.data[221] }}</tt>
     </div>
   </div>
 </template>
@@ -29,10 +29,14 @@
     // this will expand to 8 to match the physical outs of the hardware
     // they should be static values but need to verify the IDs on another computer
     var data = [controls.data[41], controls.data[59]];
+    var inputSource = controls.data[221];
 
     var input = new Nexus.Select('#input', {
-      'options': ['mic 1', 'mic 2']
+      'options': inputSource.ctrl.enums
     });
+    // set the selected input to the data from the API.
+    // weird that this isn't an option in the constructor
+    input.selectedIndex =  inputSource.value[0];
 
     var pan = new Nexus.Pan('#pan', {
       'value': 0
@@ -52,6 +56,14 @@
     });
 
     var channel = [input, pan, volume, outbus];
+
+    input.on('change', function(v) {
+      inputSource.value = v.index;
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + inputSource.numid + '&value=' + v.index )
+        .then(response => (response));
+      console.log(v);
+    });
 
     pan.on('change', function(v) {
       // how to do an equal power pan
