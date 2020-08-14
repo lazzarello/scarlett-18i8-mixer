@@ -1,5 +1,5 @@
 <template>
-  <div id="channel">
+  <div id="channel1" >
     <div id="input"></div>
     <div id="pan"></div>
     <div id="volume"></div>
