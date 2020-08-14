@@ -3,6 +3,7 @@
     <button v-on:click="pan1(controls)">Load Mixer Controls</button>
     <h1>I'm a ScarlettMixer!</h1>
     <div id="channel">
+      <div id="input"></div>
       <div id="pan"></div>
       <div id="volume"></div>
       <div id="outbus"></div>
@@ -10,7 +11,7 @@
     <div id="debug">
       <hr />
       <h3>Debugging</h3>
-      <tt>{{ controls.data[41] }}</tt>
+      <tt>{{ controls.data[59] }}</tt>
     </div>
   </div>
 </template>
@@ -20,6 +21,7 @@
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   // https://nexus-js.github.io/ui/api/#intro
   import Nexus from 'nexusui'
+
   //we gotta seperate the actual rendering of NexusUI elements before the context is started
   function loadAudio(controls) {
     Nexus.context.resume();
@@ -27,6 +29,10 @@
     // this will expand to 8 to match the physical outs of the hardware
     // they should be static values but need to verify the IDs on another computer
     var data = [controls.data[41], controls.data[59]];
+
+    var input = new Nexus.Select('#input', {
+      'options': ['mic 1', 'mic 2']
+    });
 
     var pan = new Nexus.Pan('#pan', {
       'value': 0
@@ -45,96 +51,59 @@
       'state': true
     });
 
-    var channel = [pan, volume, outbus];
+    var channel = [input, pan, volume, outbus];
 
     pan.on('change', function(v) {
-      var l;
-      var r;
-      if ( v.value === 0 ) {
-        l = data[0].value * 1
-        r = data[1].value * 1
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
-          .then(response => (console.log(response)));        
-      } else if ( v.value > 0 ) {
-        l = data[0].value * Math.abs(v.value)
-        r = data[1].value * 1
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
-          .then(response => (console.log(response)));        
-      } else if ( v.value < 0 ) {
-        r = data[0].value * 1
-        l = data[1].value * Math.abs(v.value)
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
-          .then(response => (console.log(response)));        
-      }
-      console.log(v.value);
+      // how to do an equal power pan
+      // https://forum.juce.com/t/how-do-stereo-panning-knobs-work/25773/9
+      // MATHS!
+      // http://www.cs.cmu.edu/~music/icm-online/readings/panlaws/index.html
+      var l = data[0].value * Math.min(1 - v.value, 1.0) * outbus.state;
+      var r = data[1].value * Math.min(1 + v.value, 1.0) * outbus.state;
+      // this is probably not needed because I think the API is breaking, not this code
+      // but panning does stop working after a few hundred events
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+        .then(response => (response));
+      axios
+        .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
+        .then(response => (response));        
+      console.log('Left channel: ' + l + ' Right channel: ' + r);
     })
 
     volume.on('change', function(v) {
-      // this is a mess
-      var value = v - Math.abs(v * pan.value);
-      if ( pan.value === 0 ) {
-        data[0].value = v;
-        data[1].value = v;
+      if ( outbus.state ) {
+        var l = v * Math.min(1 - pan.value, 1.0) * outbus.state;
+        var r = v * Math.min(1 + pan.value, 1.0) * outbus.state;
+        data[0].value = l;
+        data[1].value = r;
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
-          .then(response => (console.log(response)));
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
+          .then(response => (response));
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
-          .then(response => (console.log(response)));
-      } else if ( pan.value > 0 ) {
-        data[0].value = value;
-        data[1].value = v;
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + value)
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + v)
-          .then(response => (console.log(response)));
-      } else if ( pan.value < 0 ) {
-        data[0].value = v;
-        data[1].value = value;
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + v )
-          .then(response => (console.log(response)));
-        axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + value)
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
           .then(response => (response));
       }
     })
 
     outbus.on('change', function(v) {
-      var l;
-      var r;
+      // need some logic to stay muted when volume fader events move
+      var l = volume.value * Math.min(1 - pan.value, 1.0) * v;
+      var r = volume.value * Math.min(1 + pan.value, 1.0) * v;
       if ( v ) {
-        l = data[0].value * 1
-        r = data[1].value * 1
         axios
-          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
-          .then(response => (console.log(response)));
+          .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l)
+          .then(response => (response));
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
-          .then(response => (console.log(response)));        
+          .then(response => (response));        
       } else {
-        l = data[0].value * 0
-        r = data[1].value * 0
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[0].numid + '&value=' + l )
-          .then(response => (console.log(response)));
+          .then(response => (response));
         axios
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
-          .then(response => (console.log(response)));        
+          .then(response => (response));        
       } 
       console.log('Channel ' + v);
     })
