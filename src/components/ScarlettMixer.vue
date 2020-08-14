@@ -16,7 +16,7 @@
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   // https://nexus-js.github.io/ui/api/#intro
   import Nexus from 'nexusui'
-  import ScarlettMixerChannels from './components/ScarlettMixerChannels.vue'
+  import ScarlettMixerChannels from './ScarlettMixerChannels.vue'
   //we gotta seperate the actual rendering of NexusUI elements before the context is started
   function loadAudio(controls) {
     Nexus.context.resume();
