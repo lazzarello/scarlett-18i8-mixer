@@ -18,12 +18,14 @@
 <script>
   import axios from 'axios'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
+  import ScarlettMixer from './ScarlettMixer.vue'
+
   export default {
     data () {
       return {
         info: null,
         loading: true,
-        errored: false
+        errored: false,
       }
     },
     filters: {
@@ -58,7 +60,8 @@
     },
     name: 'Scarlett',
     components: {
-      'ScarlettMixer': () => import('./ScarlettMixer.vue')
+      ScarlettMixer
+      //'ScarlettMixer': () => import('./ScarlettMixer.vue')
     }
   }
 </script>
