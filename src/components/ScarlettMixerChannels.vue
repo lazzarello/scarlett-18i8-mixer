@@ -9,13 +9,12 @@
 </template>
 
 <script>
+  // this is still a mess...but it works now...
   import axios from 'axios'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   // https://vuejs.org/v2/guide/index.html#Composing-with-Components
   // https://vuejs.org/v2/guide/list.html
-  // use properties and v-bind to pass data to a channel
   import ScarlettMixerChannel from './ScarlettMixerChannel.vue'
-  // any way we can pass this from the parent component?
   import Nexus from 'nexusui'
 
   // our two output channels
