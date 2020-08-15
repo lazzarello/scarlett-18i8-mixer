@@ -116,7 +116,7 @@
       return {
         errored: false,
         controls: null,
-        items: ["one", "two"]
+        items: null
       }
     },
     mounted () {
@@ -126,7 +126,8 @@
         .get(apiURL + 'ctrl-get-all' + '&cardid=hw:USB')
         .then(response => {
           this.controls = response.data;
-          this.items = ["one", "two"];
+          this.items = this.controls.data[221].ctrl.enums;
+          //this.items = ["one", "two"];
         })
         .catch(error => {
           console.log(error)
