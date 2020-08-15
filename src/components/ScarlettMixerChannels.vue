@@ -5,11 +5,14 @@
       <p>channel {{ item }}</p>
       <ScarlettMixerChannel :id="index" />
     </div>
+    <hr />
+    <div id="debug">
+      {{ this.controls.data[221] }}
+    </div> 
   </div>
 </template>
 
 <script>
-  // this is still a mess...but it works now...
   import axios from 'axios'
   var apiURL = 'http://localhost:1234/jsonapi?request=';
   // https://vuejs.org/v2/guide/index.html#Composing-with-Components
@@ -17,9 +20,6 @@
   import ScarlettMixerChannel from './ScarlettMixerChannel.vue'
   import Nexus from 'nexusui'
 
-  // our two output channels
-  // this will expand to 8 to match the physical outs of the hardware
-  // they should be static values but need to verify the IDs on another computer
   function loadControls(controls) {
     var data = [controls.data[41], controls.data[59]];
     var inputSource = controls.data[221];
@@ -48,13 +48,12 @@
       'state': true
     });
 
-
     input.on('change', function(v) {
       inputSource.value = v.index;
       axios
         .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + inputSource.numid + '&value=' + v.index )
         .then(response => (response));
-      console.log(v);
+      //console.log(v);
     });
 
     pan.on('change', function(v) {
@@ -72,7 +71,7 @@
       axios
         .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
         .then(response => (response));        
-      console.log('Left channel: ' + l + ' Right channel: ' + r);
+      //console.log('Left channel: ' + l + ' Right channel: ' + r);
     })
 
     volume.on('change', function(v) {
@@ -91,7 +90,6 @@
     })
 
     outbus.on('change', function(v) {
-      // need some logic to stay muted when volume fader events move
       var l = volume.value * Math.min(1 - pan.value, 1.0) * v;
       var r = volume.value * Math.min(1 + pan.value, 1.0) * v;
       if ( v ) {
@@ -109,7 +107,7 @@
           .get(apiURL + 'ctrl-set-one' + '&cardid=hw:USB&numid=' + data[1].numid + '&value=' + r)
           .then(response => (response));        
       } 
-      console.log('Channel ' + v);
+      //console.log('Channel ' + v);
     })
   }
 
@@ -126,7 +124,10 @@
       // I'll have to pass in cardid from a value from the Scarlett component
       axios
         .get(apiURL + 'ctrl-get-all' + '&cardid=hw:USB')
-        .then(response => (this.controls = response.data))
+        .then(response => {
+          this.controls = response.data;
+          this.items = ["one", "two"];
+        })
         .catch(error => {
           console.log(error)
           this.errored = true
